@@ -21,7 +21,7 @@
         // Globe creation
         var geometry = new THREE.SphereGeometry(5, 32, 32);
         var loader = new THREE.TextureLoader();
-        loader.load('your_earth_texture.jpg', function(texture) {
+        loader.load('https://www.solarsystemscope.com/textures/download/2k_venus_surface.jpg', function(texture) {
             var material = new THREE.MeshBasicMaterial({ map: texture });
             var globe = new THREE.Mesh(geometry, material);
             scene.add(globe);
