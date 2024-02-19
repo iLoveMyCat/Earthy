@@ -3,14 +3,42 @@
 <head>
     <title>Interactive Globe</title>
     <style>
-        body { margin: 0; }
+        body { margin: 0; background-color: black; color: white; }
         canvas { display: block; }
+        #console-log {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            overflow-y: scroll;
+            height: 100px;
+            background-color: rgba(0,0,0,0.8); /* Semi-transparent black background */
+            color: yellow; /* Bright text color for visibility */
+            font-size: 12px;
+            padding: 5px;
+            box-sizing: border-box;
+        }
     </style>
 </head>
 <body>
+    <div id="console-log"></div> <!-- Container for console logs -->
     <script src="https://cdn.jsdelivr.net/npm/three@0.125.2/build/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.125.2/examples/js/controls/OrbitControls.js"></script>
     <script>
+        // Overriding console.log to display logs on the webpage
+        (function() {
+            var logContainer = document.getElementById('console-log');
+            var oldLog = console.log;
+            console.log = function(message) {
+                oldLog.apply(console, arguments);
+                var newLogEntry = document.createElement('div');
+                newLogEntry.textContent = message;
+                logContainer.appendChild(newLogEntry);
+                logContainer.scrollTop = logContainer.scrollHeight; // Auto-scroll to the latest log
+            };
+        })();
+
+        // Your existing script content
         var scene = new THREE.Scene();
         var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
         var renderer = new THREE.WebGLRenderer();
@@ -18,7 +46,6 @@
         document.body.appendChild(renderer.domElement);
 
         var geometry = new THREE.SphereGeometry(5, 32, 32);
-        // Start with a basic red material to ensure visibility
         var material = new THREE.MeshBasicMaterial({ color: 0xff0000 });
         var globe = new THREE.Mesh(geometry, material);
         scene.add(globe);
@@ -34,11 +61,14 @@
         loader.load('https://www.solarsystemscope.com/textures/download/2k_venus_surface.jpg', function(texture) {
             globe.material = new THREE.MeshBasicMaterial({ map: texture });
             globe.material.needsUpdate = true; // Ensure the texture updates
+            console.log("Texture loaded and applied to the globe.");
+        }, undefined, function(error) {
+            console.log("Error loading texture: " + error);
         });
 
         function animate() {
             requestAnimationFrame(animate);
-            controls.update(); // only required if controls.enableDamping = true, or if controls.autoRotate = true
+            controls.update();
             renderer.render(scene, camera);
         }
         animate();
